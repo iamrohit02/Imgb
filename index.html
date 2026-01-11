@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>ImgBB Image Uploader</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<style>
+*{box-sizing:border-box}
+body{
+  margin:0;
+  font-family:system-ui, sans-serif;
+  background:linear-gradient(135deg,#020617,#020617);
+  color:#fff;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  min-height:100vh;
+}
+.card{
+  width:100%;
+  max-width:380px;
+  background:#020617;
+  border:1px solid #1e293b;
+  border-radius:16px;
+  padding:20px;
+  box-shadow:0 0 30px rgba(56,189,248,.15);
+}
+h2{
+  text-align:center;
+  margin-bottom:16px;
+}
+input[type=file]{
+  width:100%;
+  padding:12px;
+  background:#020617;
+  border:1px dashed #38bdf8;
+  border-radius:12px;
+  color:#94a3b8;
+}
+button{
+  width:100%;
+  margin-top:14px;
+  padding:12px;
+  font-size:16px;
+  font-weight:600;
+  border-radius:12px;
+  border:2px solid #38bdf8;
+  background:transparent;
+  color:#38bdf8;
+  cursor:pointer;
+  transition:.3s;
+}
+button:hover{
+  background:#38bdf8;
+  color:#020617;
+}
+#status{
+  margin-top:12px;
+  text-align:center;
+  font-size:14px;
+  color:#94a3b8;
+}
+.link-box{
+  margin-top:12px;
+  padding:10px;
+  background:#020617;
+  border:1px solid #22c55e;
+  border-radius:10px;
+  display:none;
+}
+.link-box input{
+  width:100%;
+  background:transparent;
+  border:none;
+  color:#22c55e;
+  outline:none;
+}
+.copy{
+  margin-top:8px;
+  background:#22c55e;
+  border:none;
+  color:#020617;
+}
+</style>
+</head>
+
+<body>
+
+<div class="card">
+  <h2>ImgBB Image Uploader</h2>
+
+  <input type="file" id="file" accept="image/*">
+  <button onclick="upload()">Upload Image</button>
+
+  <div id="status"></div>
+
+  <div class="link-box" id="result">
+    <input type="text" id="imgLink" readonly>
+    <button class="copy" onclick="copyLink()">Copy Link</button>
+  </div>
+</div>
+
+<script>
+const API_KEY = "c8b9231c29c93c8bd17e0ef5468eca45";
+
+function upload(){
+  const file = document.getElementById("file").files[0];
+  const status = document.getElementById("status");
+
+  if(!file){
+    alert("Please select an image");
+    return;
+  }
+
+  if(file.size > 5 * 1024 * 1024){
+    alert("Image size max 5MB");
+    return;
+  }
+
+  status.innerText = "Uploading...";
+
+  const formData = new FormData();
+  formData.append("image", file);
+
+  fetch(`https://api.imgbb.com/1/upload?key=${API_KEY}`,{
+    method:"POST",
+    body:formData
+  })
+  .then(res => res.json())
+  .then(data => {
+    document.getElementById("imgLink").value = data.data.url;
+    document.getElementById("result").style.display = "block";
+    status.innerText = "Upload successful ✅";
+  })
+  .catch(()=>{
+    status.innerText = "Upload failed ❌";
+  });
+}
+
+function copyLink(){
+  const input = document.getElementById("imgLink");
+  input.select();
+  document.execCommand("copy");
+  alert("Link copied!");
+}
+</script>
+
+</body>
+</html>
